@@ -1,5 +1,5 @@
-import { useEffect, useRef, useMemo, useContext } from 'react';
-import { ArrowLeftRight, Loader2, ChevronDown } from 'lucide-react';
+import { useEffect, useRef, useContext } from 'react';
+import { ArrowLeftRight, Loader2 } from 'lucide-react';
 import { getFlagUrl, hasFlag } from '../utils/currencyFlags';
 import { ThemeContext } from '../context/ThemeContext';
 
@@ -54,40 +54,13 @@ export function CurrencyConverter({
   const baseFlagUrl = hasFlag(baseCurrency) ? getFlagUrl(baseCurrency) : null;
   const targetFlagUrl = hasFlag(targetCurrency) ? getFlagUrl(targetCurrency) : null;
 
-  function CurrencySelect({ label, currency, onChange, currencies, flagUrl }) {
-  return (
-    <div className="flex-1 min-w-[200px]">
-      <label className={`block text-xs font-semibold tracking-wider text-slate-400 uppercase mb-2 ${isDark ? '' : ''}`}>
-        {label}
-      </label>
-      <div className="relative flex items-center">
-        {flagUrl && (
-          <img
-            src={flagUrl}
-            alt={currency}
-            className="absolute left-3 w-6 h-4 rounded object-cover z-10 pointer-events-none"
-          />
-        )}
-        <select
-          value={currency}
-          onChange={(e) => onChange(e.target.value)}
-          className={`w-full font-medium text-sm py-3 pl-11 pr-8 rounded-xl border focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer transition-colors ${isDark 
-            ? 'bg-slate-800/80 text-white border-slate-700' 
-            : 'bg-white/80 text-slate-900 border-slate-200/80'}`}
-        >
-          {Object.entries(currencies).map(([code, name]) => (
-            <option key={code} value={code} className={isDark ? 'bg-slate-900 text-white' : 'bg-white text-slate-900'}>
-              {code} — {name}
-            </option>
-          ))}
-        </select>
-        <div className="absolute right-3 pointer-events-none text-slate-400 text-xs">
-          ▼
-        </div>
-</div>
-    </div>
-  );
-  }
+  const selectClasses = isDark
+    ? 'bg-slate-800/80 text-white border-slate-700'
+    : 'bg-white/80 text-slate-900 border-slate-200/80';
+
+  const optionClasses = isDark ? 'bg-slate-900 text-white' : 'bg-white text-slate-900';
+
+  const labelClasses = 'block text-xs font-semibold tracking-wider text-slate-400 uppercase mb-2';
 
   return (
     <div className="space-y-4">
@@ -96,7 +69,6 @@ export function CurrencyConverter({
         <h2 id="result-title" className="sr-only">Resultado da Conversão</h2>
         
         <div className={`relative ${isDark ? 'bg-slate-900/70 backdrop-blur-md border border-emerald-500/30 shadow-2xl shadow-emerald-500/10' : 'bg-white/90 backdrop-blur-md border border-emerald-500/30 shadow-2xl shadow-emerald-500/10'} rounded-2xl p-6 overflow-hidden`}>
-          {/* Background glow */}
           <div className={`absolute inset-0 ${isDark ? 'bg-gradient-to-br from-emerald-500/10 via-transparent to-cyan-500/10' : 'bg-gradient-to-br from-emerald-500/15 via-transparent to-cyan-500/15'}`} />
           <div className="absolute top-0 right-0 w-72 h-72 bg-emerald-500/5 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2" />
           
@@ -168,14 +140,33 @@ export function CurrencyConverter({
 
           {/* Currency Selectors with Swap */}
           <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-end">
-            <CurrencySelect
-              label="De"
-              currency={baseCurrency}
-              onChange={setBaseCurrency}
-              currencies={currencies}
-              flagUrl={baseFlagUrl}
-            />
+            {/* ORIGEM / DE */}
+            <div className="flex-1 min-w-[200px]">
+              <label className={labelClasses}>De</label>
+              <div className="relative flex items-center">
+                {baseFlagUrl && (
+                  <img
+                    src={baseFlagUrl}
+                    alt={baseCurrency}
+                    className="absolute left-3 w-6 h-4 rounded object-cover z-10 pointer-events-none"
+                  />
+                )}
+                <select
+                  value={baseCurrency}
+                  onChange={(e) => setBaseCurrency(e.target.value)}
+                  className={`w-full font-medium text-sm py-3 pl-11 pr-8 rounded-xl border focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer transition-colors ${selectClasses}`}
+                >
+                  {Object.entries(currencies).map(([code, name]) => (
+                    <option key={code} value={code} className={optionClasses}>
+                      {code} — {name}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute right-3 pointer-events-none text-slate-400 text-xs">▼</div>
+              </div>
+            </div>
 
+            {/* SWAP BUTTON */}
             <button
               ref={swapRef}
               type="button"
@@ -188,17 +179,34 @@ export function CurrencyConverter({
               aria-label="Inverter moedas"
             >
               <ArrowLeftRight className="w-5 h-5 transition-transform duration-300" />
-              {/* Metallic ring effect */}
               <span className={`absolute inset-0 border rounded-full opacity-50 ${isDark ? 'border-emerald-500/20' : 'border-emerald-500/30'}`} />
             </button>
 
-            <CurrencySelect
-              label="Para"
-              currency={targetCurrency}
-              onChange={setTargetCurrency}
-              currencies={currencies}
-              flagUrl={targetFlagUrl}
-            />
+            {/* DESTINO / PARA */}
+            <div className="flex-1 min-w-[200px]">
+              <label className={labelClasses}>Para</label>
+              <div className="relative flex items-center">
+                {targetFlagUrl && (
+                  <img
+                    src={targetFlagUrl}
+                    alt={targetCurrency}
+                    className="absolute left-3 w-6 h-4 rounded object-cover z-10 pointer-events-none"
+                  />
+                )}
+                <select
+                  value={targetCurrency}
+                  onChange={(e) => setTargetCurrency(e.target.value)}
+                  className={`w-full font-medium text-sm py-3 pl-11 pr-8 rounded-xl border focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer transition-colors ${selectClasses}`}
+                >
+                  {Object.entries(currencies).map(([code, name]) => (
+                    <option key={code} value={code} className={optionClasses}>
+                      {code} — {name}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute right-3 pointer-events-none text-slate-400 text-xs">▼</div>
+              </div>
+            </div>
           </div>
         </div>
 
