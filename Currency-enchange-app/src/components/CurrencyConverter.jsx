@@ -54,50 +54,40 @@ export function CurrencyConverter({
   const baseFlagUrl = hasFlag(baseCurrency) ? getFlagUrl(baseCurrency) : null;
   const targetFlagUrl = hasFlag(targetCurrency) ? getFlagUrl(targetCurrency) : null;
 
-  const CurrencyOption = ({ code, name, isSelected }) => {
-    const flagUrl = hasFlag(code) ? getFlagUrl(code) : null;
-    return (
-      <option key={code} value={code} selected={isSelected} className="flex items-center gap-2 px-2 py-1">
-        {flagUrl && <img src={flagUrl} alt={code} className="w-6 h-4 rounded" loading="lazy" />}
-        <span>{code} — {name}</span>
-      </option>
-    );
-  };
-
-  const CurrencySelect = ({ currency, onChange, label, id, flagUrl }) => (
-    <div className="relative group">
-      <label htmlFor={id} className={`block text-xs font-medium mb-1.5 uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+  function CurrencySelect({ label, currency, onChange, currencies, flagUrl }) {
+  return (
+    <div className="flex-1 min-w-[200px]">
+      <label className={`block text-xs font-semibold tracking-wider text-slate-400 uppercase mb-2 ${isDark ? '' : ''}`}>
         {label}
       </label>
-      <div className="relative">
+      <div className="relative flex items-center">
+        {flagUrl && (
+          <img
+            src={flagUrl}
+            alt={currency}
+            className="absolute left-3 w-6 h-4 rounded object-cover z-10 pointer-events-none"
+          />
+        )}
         <select
-          id={id}
           value={currency}
           onChange={(e) => onChange(e.target.value)}
-          className={`w-full appearance-none px-4 py-3.5 pr-14 text-sm font-medium ${isDark ? 'text-slate-100' : 'text-slate-900'} 
-            ${isDark ? 'bg-slate-900/70 backdrop-blur-md border border-slate-700/50' : 'bg-white/80 backdrop-blur-md border border-slate-200/80'} 
-            rounded-xl 
-            focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 
-            transition-all cursor-pointer ${isDark ? 'hover:border-slate-600' : 'hover:border-slate-300'}`}
+          className={`w-full font-medium text-sm py-3 pl-11 pr-8 rounded-xl border focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer transition-colors ${isDark 
+            ? 'bg-slate-800/80 text-white border-slate-700' 
+            : 'bg-white/80 text-slate-900 border-slate-200/80'}`}
         >
           {Object.entries(currencies).map(([code, name]) => (
-            <CurrencyOption key={code} code={code} name={name} isSelected={code === currency} />
+            <option key={code} value={code} className={isDark ? 'bg-slate-900 text-white' : 'bg-white text-slate-900'}>
+              {code} — {name}
+            </option>
           ))}
         </select>
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none">
-          {flagUrl && (
-            <img
-              src={flagUrl}
-              alt={`${currency} flag`}
-              className={`w-6 h-4 rounded-full shadow-md ${isDark ? 'ring-1 ring-slate-700/50' : 'ring-1 ring-slate-200/80'}`}
-              loading="lazy"
-            />
-          )}
-          <ChevronDown className={`w-4 h-4 transition-colors ${isDark ? 'text-slate-500 group-hover:text-emerald-400' : 'text-slate-400 group-hover:text-emerald-500'}`} />
+        <div className="absolute right-3 pointer-events-none text-slate-400 text-xs">
+          ▼
         </div>
-      </div>
+</div>
     </div>
   );
+  }
 
   return (
     <div className="space-y-4">
@@ -179,10 +169,10 @@ export function CurrencyConverter({
           {/* Currency Selectors with Swap */}
           <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-end">
             <CurrencySelect
+              label="De"
               currency={baseCurrency}
               onChange={setBaseCurrency}
-              label="De"
-              id="baseCurrency"
+              currencies={currencies}
               flagUrl={baseFlagUrl}
             />
 
@@ -203,10 +193,10 @@ export function CurrencyConverter({
             </button>
 
             <CurrencySelect
+              label="Para"
               currency={targetCurrency}
               onChange={setTargetCurrency}
-              label="Para"
-              id="targetCurrency"
+              currencies={currencies}
               flagUrl={targetFlagUrl}
             />
           </div>

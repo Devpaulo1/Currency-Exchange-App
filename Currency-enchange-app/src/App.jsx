@@ -2,7 +2,7 @@ import { useCurrency } from './hooks/useCurrency';
 import { CurrencyConverter } from './components/CurrencyConverter';
 import { HistoricalChart } from './components/HistoricalChart';
 import { HistoricalTable } from './components/HistoricalTable';
-import { Sun, Moon, Wifi, WifiOff, Shield, ShieldAlert, Loader2, Sparkles, Zap } from 'lucide-react';
+import { Sun, Moon, Wifi, WifiOff, Shield, ShieldAlert, Loader2 } from 'lucide-react';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 
 function AppContent() {
@@ -59,10 +59,11 @@ function AppContent() {
         <div className="max-w-5xl mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
-              <div className="relative w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-emerald-500/25">
-                <Zap className="w-6 h-6 text-slate-950" />
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-500 opacity-20 blur" />
-              </div>
+              <img 
+                src="/images/image-1.jpg" 
+                alt="Fintech Pro" 
+                className="w-10 h-10 rounded-full object-cover border-2 border-emerald-500/50 shadow-md"
+              />
               <div>
                 <h1 className={`text-xl font-bold tracking-tight ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>Currency Exchange</h1>
                 <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Taxas em tempo real via Frankfurter API</p>

@@ -174,16 +174,15 @@ export function HistoricalChart({
           <div className={`flex-shrink-0 w-10 h-10 rounded-xl ${colors.headerBg} flex items-center justify-center ${colors.headerBorder}`}>
             <span className="font-mono text-sm text-emerald-500">{baseCurrency}/{targetCurrency}</span>
           </div>
-          <div className="min-w-0">
-            <h3 className={`text-lg font-semibold ${colors.textPrimary} flex items-center gap-2 truncate`}>
+          <div className="min-w-0 flex items-center gap-2">
+            <h3 className={`text-lg font-semibold ${colors.textPrimary} truncate`}>
+              Histórico
+            </h3>
+            <div className="flex-shrink-0 flex items-center gap-1">
               {baseFlagUrl && <img src={baseFlagUrl} alt={baseCurrency} className="w-5 h-3 rounded flex-shrink-0" loading="lazy" />}
               <span className={isDark ? 'text-slate-300' : 'text-slate-400'}>→</span>
               {targetFlagUrl && <img src={targetFlagUrl} alt={targetCurrency} className="w-5 h-3 rounded flex-shrink-0" loading="lazy" />}
-              <span className="truncate">Histórico</span>
-            </h3>
-            <p className={`text-xs ${colors.textMuted} mt-0.5 truncate`}>
-              Variação nos últimos {PERIOD_OPTIONS.find((p) => p.value === period)?.label || period}
-            </p>
+            </div>
           </div>
         </div>
 
