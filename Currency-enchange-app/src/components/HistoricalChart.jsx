@@ -35,24 +35,20 @@ function formatYAxisTick(value) {
   });
 }
 
-function CustomTooltip({ active, payload, label, theme }) {
+function CustomTooltip({ active, payload, label, baseCurrency, targetCurrency, theme }) {
   if (!active || !payload?.length) return null;
 
   const data = payload[0].value;
   const date = new Date(label);
   const isDark = theme === 'dark';
 
-  const baseFlag = hasFlag(payload[0].dataKey?.split('.')[0] || 'USD') 
-    ? getFlagUrl(payload[0].dataKey?.split('.')[0] || 'USD') 
-    : null;
-  const targetFlag = hasFlag(payload[0].dataKey?.split('.')[1] || 'BRL') 
-    ? getFlagUrl(payload[0].dataKey?.split('.')[1] || 'BRL') 
-    : null;
+  const baseFlag = hasFlag(baseCurrency) ? getFlagUrl(baseCurrency) : null;
+  const targetFlag = hasFlag(targetCurrency) ? getFlagUrl(targetCurrency) : null;
 
   return (
-    <div className="relative bg-slate-900/80 backdrop-blur-md border border-emerald-500/30 rounded-xl p-3 shadow-2xl shadow-emerald-500/10 min-w-[200px] z-50">
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-cyan-500/5 rounded-xl" />
-      <p className="relative text-xs text-slate-400 font-medium mb-2">
+    <div className={`relative min-w-[200px] z-50 rounded-xl p-3 shadow-2xl ${isDark ? 'bg-slate-900/80 backdrop-blur-md border border-emerald-500/30 shadow-emerald-500/10' : 'bg-white/95 backdrop-blur-md border border-slate-200/80 shadow-slate-200/50'}`}>
+      <div className={`absolute inset-0 rounded-xl ${isDark ? 'bg-gradient-to-br from-emerald-500/5 via-transparent to-cyan-500/5' : 'bg-gradient-to-br from-emerald-500/10 via-transparent to-cyan-500/10'}`} />
+      <p className={`relative text-xs font-medium mb-2 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
         {date.toLocaleDateString('pt-BR', {
           weekday: 'long',
           day: '2-digit',
@@ -61,11 +57,11 @@ function CustomTooltip({ active, payload, label, theme }) {
         })}
       </p>
       <div className="relative flex items-center gap-2 mb-1">
-        {baseFlag && <img src={baseFlag} alt="" className="w-5 h-3 rounded ring-1 ring-slate-700" loading="lazy" />}
-        <span className="text-slate-300 text-xs">→</span>
-        {targetFlag && <img src={targetFlag} alt="" className="w-5 h-3 rounded ring-1 ring-slate-700" loading="lazy" />}
+        {baseFlag && <img src={baseFlag} alt={baseCurrency} className="w-5 h-3 rounded ring-1" loading="lazy" />}
+        <span className={`text-xs ${isDark ? 'text-slate-300' : 'text-slate-500'}`}>→</span>
+        {targetFlag && <img src={targetFlag} alt={targetCurrency} className="w-5 h-3 rounded ring-1" loading="lazy" />}
       </div>
-      <p className="relative font-mono text-lg font-semibold text-emerald-400">
+      <p className={`relative font-mono text-lg font-semibold ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`}>
         {data.toLocaleString(undefined, {
           minimumFractionDigits: 4,
           maximumFractionDigits: 6,
@@ -83,11 +79,23 @@ const THEME_COLORS = {
     gridStroke: 'rgba(148, 163, 184, 0.2)',
     axisTick: '#64748b',
     axisLine: 'rgba(148, 163, 184, 0.3)',
-    tooltipBg: 'rgba(15, 23, 42, 0.9)',
-    tooltipBorder: 'rgba(16, 185, 129, 0.3)',
     loadingBg: 'rgba(248, 250, 252, 0.8)',
     loadingColor: '#64748b',
     emptyColor: '#94a3b8',
+    cardBg: 'bg-white/80',
+    cardBorder: 'border-slate-200/80',
+    cardShadow: 'shadow-xl shadow-slate-200/50',
+    textPrimary: 'text-slate-900',
+    textSecondary: 'text-slate-500',
+    textMuted: 'text-slate-400',
+    headerBg: 'bg-emerald-500/10',
+    headerBorder: 'border-emerald-500/20',
+    periodActiveBg: 'bg-emerald-100',
+    periodActiveText: 'text-emerald-700',
+    periodActiveBorder: 'border-emerald-300',
+    periodInactiveText: 'text-slate-500',
+    periodInactiveHoverBg: 'bg-slate-100',
+    periodInactiveHoverText: 'text-slate-700',
   },
   dark: {
     stroke: '#10b981',
@@ -96,11 +104,23 @@ const THEME_COLORS = {
     gridStroke: 'rgba(51, 65, 85, 0.5)',
     axisTick: '#9ca3af',
     axisLine: 'rgba(55, 65, 81, 0.5)',
-    tooltipBg: 'rgba(17, 24, 39, 0.95)',
-    tooltipBorder: 'rgba(16, 185, 129, 0.4)',
     loadingBg: 'rgba(6, 9, 19, 0.8)',
     loadingColor: '#9ca3af',
     emptyColor: '#6b7280',
+    cardBg: 'bg-slate-900/50',
+    cardBorder: 'border-slate-700/50',
+    cardShadow: 'shadow-xl shadow-emerald-500/5',
+    textPrimary: 'text-slate-100',
+    textSecondary: 'text-slate-400',
+    textMuted: 'text-slate-500',
+    headerBg: 'bg-emerald-500/20',
+    headerBorder: 'border-emerald-500/30',
+    periodActiveBg: 'bg-emerald-500/20',
+    periodActiveText: 'text-emerald-300',
+    periodActiveBorder: 'border-emerald-500/30',
+    periodInactiveText: 'text-slate-400',
+    periodInactiveHoverBg: 'bg-slate-800/50',
+    periodInactiveHoverText: 'text-slate-100',
   },
 };
 
@@ -141,33 +161,33 @@ export function HistoricalChart({
   return (
     <section
       aria-labelledby="chart-title"
-      className="relative bg-slate-900/50 backdrop-blur-md border border-slate-700/50 rounded-2xl p-6 shadow-xl shadow-emerald-500/5 overflow-hidden"
+      className={`relative ${colors.cardBg} backdrop-blur-md ${colors.cardBorder} rounded-2xl p-6 ${colors.cardShadow} overflow-hidden`}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-cyan-500/5 pointer-events-none" />
+      <div className={`absolute inset-0 pointer-events-none ${isDark ? 'bg-gradient-to-br from-emerald-500/5 via-transparent to-cyan-500/5' : 'bg-gradient-to-br from-emerald-500/10 via-transparent to-cyan-500/10'}`} />
       
       <h2 id="chart-title" className="sr-only">
         Gráfico histórico {baseCurrency} → {targetCurrency}
       </h2>
 
       <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
-            <span className="text-emerald-400 font-mono text-sm">{baseCurrency}/{targetCurrency}</span>
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          <div className={`flex-shrink-0 w-10 h-10 rounded-xl ${colors.headerBg} flex items-center justify-center ${colors.headerBorder}`}>
+            <span className="font-mono text-sm text-emerald-500">{baseCurrency}/{targetCurrency}</span>
           </div>
-          <div>
-            <h3 className="text-lg font-semibold text-slate-100 flex items-center gap-2">
-              {baseFlagUrl && <img src={baseFlagUrl} alt="" className="w-5 h-3 rounded" loading="lazy" />}
-              <span>→</span>
-              {targetFlagUrl && <img src={targetFlagUrl} alt="" className="w-5 h-3 rounded" loading="lazy" />}
-              Histórico
+          <div className="min-w-0">
+            <h3 className={`text-lg font-semibold ${colors.textPrimary} flex items-center gap-2 truncate`}>
+              {baseFlagUrl && <img src={baseFlagUrl} alt={baseCurrency} className="w-5 h-3 rounded flex-shrink-0" loading="lazy" />}
+              <span className={isDark ? 'text-slate-300' : 'text-slate-400'}>→</span>
+              {targetFlagUrl && <img src={targetFlagUrl} alt={targetCurrency} className="w-5 h-3 rounded flex-shrink-0" loading="lazy" />}
+              <span className="truncate">Histórico</span>
             </h3>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className={`text-xs ${colors.textMuted} mt-0.5 truncate`}>
               Variação nos últimos {PERIOD_OPTIONS.find((p) => p.value === period)?.label || period}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-1 bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-1" role="tablist">
+        <div className={`flex-shrink-0 flex items-center gap-1 backdrop-blur-sm rounded-xl p-1 ${isDark ? 'bg-slate-900/50 border border-slate-700/50' : 'bg-white/80 border border-slate-200/80'}`} role="tablist">
           {PERIOD_OPTIONS.map((opt) => (
             <button
               key={opt.value}
@@ -178,8 +198,8 @@ export function HistoricalChart({
               disabled={historicalLoading}
               className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 ${
                 period === opt.value
-                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shadow-lg shadow-emerald-500/10'
-                  : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/50'
+                  ? `${colors.periodActiveBg} ${colors.periodActiveText} ${colors.periodActiveBorder} shadow-lg`
+                  : `${colors.periodInactiveText} hover:${colors.periodInactiveHoverText} hover:${colors.periodInactiveHoverBg}`
               } disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               {opt.label}
@@ -216,7 +236,6 @@ export function HistoricalChart({
                 <stop offset="0%" stopColor={colors.gradientStart} />
                 <stop offset="100%" stopColor={colors.gradientEnd} />
               </linearGradient>
-              {/* Neon glow filter */}
               <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
                 <feGaussianBlur stdDeviation="3" result="coloredBlur" />
                 <feMerge>
@@ -260,7 +279,7 @@ export function HistoricalChart({
             />
 
             <Tooltip
-              content={(props) => <CustomTooltip {...props} theme={theme} />}
+              content={(props) => <CustomTooltip {...props} baseCurrency={baseCurrency} targetCurrency={targetCurrency} theme={theme} />}
               wrapperStyle={{
                 outline: 'none',
                 backgroundColor: 'transparent',

@@ -1,6 +1,7 @@
-import { useEffect, useRef, useMemo } from 'react';
+import { useEffect, useRef, useMemo, useContext } from 'react';
 import { ArrowLeftRight, Loader2, ChevronDown } from 'lucide-react';
 import { getFlagUrl, hasFlag } from '../utils/currencyFlags';
+import { ThemeContext } from '../context/ThemeContext';
 
 export function CurrencyConverter({
   amount,
@@ -17,6 +18,8 @@ export function CurrencyConverter({
   swapCurrencies,
   convertedAmount,
 }) {
+  const { theme } = useContext(ThemeContext);
+  const isDark = theme === 'dark';
   const amountRef = useRef(null);
   const swapRef = useRef(null);
 
@@ -63,7 +66,7 @@ export function CurrencyConverter({
 
   const CurrencySelect = ({ currency, onChange, label, id, flagUrl }) => (
     <div className="relative group">
-      <label htmlFor={id} className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wider">
+      <label htmlFor={id} className={`block text-xs font-medium mb-1.5 uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
         {label}
       </label>
       <div className="relative">
@@ -71,10 +74,11 @@ export function CurrencyConverter({
           id={id}
           value={currency}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full appearance-none px-4 py-3.5 pr-14 text-sm font-medium text-slate-100 
-            bg-slate-900/70 backdrop-blur-md border border-slate-700/50 rounded-xl 
+          className={`w-full appearance-none px-4 py-3.5 pr-14 text-sm font-medium ${isDark ? 'text-slate-100' : 'text-slate-900'} 
+            ${isDark ? 'bg-slate-900/70 backdrop-blur-md border border-slate-700/50' : 'bg-white/80 backdrop-blur-md border border-slate-200/80'} 
+            rounded-xl 
             focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 
-            transition-all cursor-pointer hover:border-slate-600"
+            transition-all cursor-pointer ${isDark ? 'hover:border-slate-600' : 'hover:border-slate-300'}`}
         >
           {Object.entries(currencies).map(([code, name]) => (
             <CurrencyOption key={code} code={code} name={name} isSelected={code === currency} />
@@ -85,11 +89,11 @@ export function CurrencyConverter({
             <img
               src={flagUrl}
               alt={`${currency} flag`}
-              className="w-6 h-4 rounded-full ring-1 ring-slate-700/50 shadow-md"
+              className={`w-6 h-4 rounded-full shadow-md ${isDark ? 'ring-1 ring-slate-700/50' : 'ring-1 ring-slate-200/80'}`}
               loading="lazy"
             />
           )}
-          <ChevronDown className="w-4 h-4 text-slate-500 group-hover:text-emerald-400 transition-colors" />
+          <ChevronDown className={`w-4 h-4 transition-colors ${isDark ? 'text-slate-500 group-hover:text-emerald-400' : 'text-slate-400 group-hover:text-emerald-500'}`} />
         </div>
       </div>
     </div>
@@ -101,37 +105,37 @@ export function CurrencyConverter({
       <section aria-labelledby="result-title" className="relative">
         <h2 id="result-title" className="sr-only">Resultado da Conversão</h2>
         
-        <div className="relative bg-slate-900/70 backdrop-blur-md border border-emerald-500/30 rounded-2xl p-6 shadow-2xl shadow-emerald-500/10 overflow-hidden">
+        <div className={`relative ${isDark ? 'bg-slate-900/70 backdrop-blur-md border border-emerald-500/30 shadow-2xl shadow-emerald-500/10' : 'bg-white/90 backdrop-blur-md border border-emerald-500/30 shadow-2xl shadow-emerald-500/10'} rounded-2xl p-6 overflow-hidden`}>
           {/* Background glow */}
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-transparent to-cyan-500/10" />
+          <div className={`absolute inset-0 ${isDark ? 'bg-gradient-to-br from-emerald-500/10 via-transparent to-cyan-500/10' : 'bg-gradient-to-br from-emerald-500/15 via-transparent to-cyan-500/15'}`} />
           <div className="absolute top-0 right-0 w-72 h-72 bg-emerald-500/5 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2" />
           
           <div className="relative z-10">
             {convertedAmount && exchangeRate ? (
               <div className="text-center space-y-2">
-                <p className="text-slate-400 text-xs uppercase tracking-widest font-medium">
+                <p className={`text-xs uppercase tracking-widest font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                   Valor Convertido
                 </p>
                 <div className="space-y-1">
                   <p className="text-5xl sm:text-7xl font-bold tabular-nums bg-gradient-to-r from-emerald-400 via-cyan-300 to-emerald-400 bg-clip-text text-transparent animate-pulse">
                     {formatAmount(convertedAmount)}
                   </p>
-                  <p className="text-sm text-slate-400 font-medium">
+                  <p className={`text-sm font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                     {targetCurrency}
                   </p>
                 </div>
-                <p className="text-slate-500 text-xs mt-1">
+                <p className={`text-xs mt-1 ${isDark ? 'text-slate-500' : 'text-slate-500'}`}>
                   {formatAmount(amount)} {baseCurrency} × {formatRate(exchangeRate)}
                 </p>
               </div>
             ) : !exchangeRate && !loading && !error ? (
-              <div className="text-center py-4 text-slate-500">
-                <p className="text-sm">Selecione as moedas para ver a conversão</p>
+              <div className="text-center py-4">
+                <p className={`text-sm ${isDark ? 'text-slate-500' : 'text-slate-500'}`}>Selecione as moedas para ver a conversão</p>
               </div>
             ) : loading ? (
-              <div className="flex items-center justify-center gap-3 py-4 text-slate-400">
+              <div className="flex items-center justify-center gap-3 py-4">
                 <Loader2 className="w-6 h-6 animate-spin text-emerald-500" />
-                <span className="text-sm font-medium">Atualizando...</span>
+                <span className={`text-sm font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Atualizando...</span>
               </div>
             ) : null}
           </div>
@@ -139,17 +143,17 @@ export function CurrencyConverter({
       </section>
 
       {/* Input & Currency Selectors */}
-      <section aria-labelledby="converter-title" className="bg-slate-900/50 backdrop-blur-md border border-slate-700/50 rounded-2xl p-6 shadow-xl">
+      <section aria-labelledby="converter-title" className={`rounded-2xl p-6 shadow-xl ${isDark ? 'bg-slate-900/50 backdrop-blur-md border border-slate-700/50' : 'bg-white/80 backdrop-blur-md border border-slate-200/80 shadow-slate-200/50'}`}>
         <h2 id="converter-title" className="sr-only">Conversor de Moedas</h2>
         
         <div className="space-y-5">
           {/* Amount Input */}
           <div>
-            <label htmlFor="amount" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wider">
+            <label htmlFor="amount" className={`block text-xs font-medium mb-1.5 uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
               Valor a Converter
             </label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium text-lg">
+              <span className={`absolute left-4 top-1/2 -translate-y-1/2 font-medium text-lg ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                 {baseCurrency}
               </span>
               <input
@@ -160,10 +164,11 @@ export function CurrencyConverter({
                 min="0"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 text-3xl font-semibold text-slate-100 
-                  bg-slate-900/70 backdrop-blur-sm border border-slate-700/50 rounded-xl 
+                className={`w-full pl-12 pr-4 py-4 text-3xl font-semibold ${isDark ? 'text-slate-100' : 'text-slate-900'} 
+                  ${isDark ? 'bg-slate-900/70 backdrop-blur-sm border border-slate-700/50' : 'bg-white/80 backdrop-blur-sm border border-slate-200/80'} 
+                  rounded-xl 
                   focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 
-                  transition-all placeholder:text-slate-500"
+                  transition-all ${isDark ? 'placeholder:text-slate-500' : 'placeholder:text-slate-400'}`}
                 placeholder="0,00"
                 aria-label="Valor a converter"
                 inputMode="decimal"
@@ -186,16 +191,15 @@ export function CurrencyConverter({
               type="button"
               onClick={handleSwap}
               disabled={loading}
-              className="flex-shrink-0 mx-auto relative p-3 bg-slate-900/70 backdrop-blur-md border border-emerald-500/30 rounded-full 
-                text-slate-400 hover:text-emerald-400 hover:border-emerald-500/50 hover:bg-emerald-500/10 
+              className={`flex-shrink-0 mx-auto relative p-3 rounded-full 
+                ${isDark ? 'bg-slate-900/70 backdrop-blur-md border border-emerald-500/30 text-slate-400 hover:text-emerald-400 hover:border-emerald-500/50 hover:bg-emerald-500/10 shadow-lg shadow-emerald-500/10' : 'bg-white/80 backdrop-blur-md border border-emerald-500/30 text-slate-500 hover:text-emerald-500 hover:border-emerald-500/50 hover:bg-emerald-500/10 shadow-lg shadow-emerald-500/10'}
                 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed 
-                focus:outline-none focus:ring-2 focus:ring-emerald-500/50
-                shadow-lg shadow-emerald-500/10"
+                focus:outline-none focus:ring-2 focus:ring-emerald-500/50`}
               aria-label="Inverter moedas"
             >
               <ArrowLeftRight className="w-5 h-5 transition-transform duration-300" />
               {/* Metallic ring effect */}
-              <span className="absolute inset-0 border border-emerald-500/20 rounded-full opacity-50" />
+              <span className={`absolute inset-0 border rounded-full opacity-50 ${isDark ? 'border-emerald-500/20' : 'border-emerald-500/30'}`} />
             </button>
 
             <CurrencySelect
@@ -209,25 +213,25 @@ export function CurrencyConverter({
         </div>
 
         {error && (
-          <div className="mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm flex items-center gap-2">
+          <div className="mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-600 dark:text-red-400 text-sm flex items-center gap-2">
             <Loader2 className="w-4 h-4 animate-spin" />
             {error}
           </div>
         )}
 
         {/* Rate Display */}
-        <div className="mt-4 pt-4 border-t border-slate-700/30">
+        <div className="mt-4 pt-4 border-t">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="flex items-center gap-3">
-              <span className="text-slate-400 text-xs uppercase tracking-wider">Taxa Atual</span>
-              <div className="px-3 py-1.5 bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-lg">
-                <span className="font-mono text-lg font-semibold text-slate-100">
+              <span className={`text-xs uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Taxa Atual</span>
+              <div className={`px-3 py-1.5 rounded-lg ${isDark ? 'bg-slate-900/50 backdrop-blur-sm border border-slate-700/50' : 'bg-slate-100/80 backdrop-blur-sm border border-slate-200/80'}`}>
+                <span className={`font-mono text-lg font-semibold ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
                   1 {baseCurrency} = {formatRate(exchangeRate)} {targetCurrency}
                 </span>
               </div>
             </div>
             {date && (
-              <time dateTime={date} className="text-xs text-slate-500 font-mono whitespace-nowrap">
+              <time dateTime={date} className={`text-xs font-mono whitespace-nowrap ${isDark ? 'text-slate-500' : 'text-slate-500'}`}>
                 {new Date(date).toLocaleDateString('pt-BR', {
                   day: '2-digit',
                   month: '2-digit',
